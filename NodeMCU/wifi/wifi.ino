@@ -1,3 +1,10 @@
+#include <AuthClient.h>
+#include <debug.h>
+#include <MicroGear.h>
+#include <MQTTClient.h>
+#include <PubSubClient.h>
+#include <SHA1.h>
+
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
@@ -88,5 +95,5 @@ void loop() {
     reconnect();
   }
   client.loop();
-  delay(3);
+  delay(10);
 }
