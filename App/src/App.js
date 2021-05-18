@@ -15,7 +15,7 @@ import closeImg from "./resource/close.png";
 const microgear = Microgear.create({
   key: config.appKey,
   secret: config.appSecret,
-  alias: "web",
+  alias: "web2",
 });
 
 class App extends Component {
@@ -24,7 +24,7 @@ class App extends Component {
     this.state = { time: null, msg: null };
     // this.onSwitch = this.onSwitch.bind(this);
     this.onMessage = this.onMessage.bind(this);
-    microgear.on("message", this.onMessage);
+    // microgear.on("message", this.onMessage);
     // microgear.on("connected", this.onconnected);
 
     // microgear.connect(config.appId);
@@ -32,17 +32,20 @@ class App extends Component {
   }
 
   componentDidMount() {
+    microgear.on('message', this.onMessage);
+    microgear.on('connected', this.onconnected);
+
     microgear.connect(config.appId);
-    // microgear.subscribe(config.topic);
+    microgear.subscribe(config.topic);
   }
 
   onconnected() {
     microgear.setAlias("nodeMCU2");
-    console.log("connected");
+    // console.log("connected");
   }
 
   onMessage(topic, msg2) {
-    // console.log(msg2);
+    console.log(msg2);
     const nowTime = new Date().getUTCHours() + ":" + new Date().getUTCMinutes();
     this.setState({ time: nowTime, msg: msg2 });
   }
@@ -52,6 +55,7 @@ class App extends Component {
     // this.setState({ waiting: true });
     event.preventDefault();
     // microgear.publish(topic, 'ON' );
+    // console.log(event.target.text.value)
     // console.log(event.target.text.value)
     microgear.chat("nodeMCU", event.target.text.value);
   };
