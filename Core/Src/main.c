@@ -71,7 +71,6 @@ uint8_t Distance2 = 0;
 uint8_t state = 0;
 uint8_t time = 0;
 uint8_t check = 0;
-uint8_t buffer[16];
 char c[8];
 
 uint8_t CHECK_MAX = 3;
@@ -146,37 +145,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//		HCSR04_Read();
-//		if(Distance < 20){
-//			sprintf(buffer,"[1] %d %d\n\r", state, Distance);
-//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
-//		}
-////
-//		HAL_Delay(75);
-//
-//		HCSR04_Read2();
-//		if(Distance2 < 20){
-//			sprintf(buffer,"[2] %d %d\n\r", state, Distance2);
-//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
-//		}
 		if (HAL_UART_Receive(&huart6, &c, 8, 10) == HAL_OK) {
-			HAL_UART_Transmit(&huart2, &c, strlen(c), 100);
-			if (state!= 4 && !strcmp(c, "11111111")) {
+			if (state!=4 && !strcmp(c, "11111111")) {
 				state = 4;
-			} else {
+			} else if (state!=3 && !strcmp(c, "00000000")) {
 				state = 3;
 			}
 		}
 		HCSR04_Read();
-//		sprintf(buffer,"%d %d %d %d\n\r", state, Distance, Distance2, htim3.Instance->CCR1);
-//		HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
 		if (state == 0) {
 			htim3.Instance->CCR1 = CCR_MIN;
 			if (Distance < 30 && Distance > 2) {
 				state = 1;
 				check = CHECK_MAX;
-//				char c[8] = "-1";
-//				HAL_UART_Transmit(&huart6, &c, strlen(c), 100);
 			}
 		} else if (state == 1) {
 			if (Distance < 30 && Distance > 2) {
@@ -187,10 +168,8 @@ int main(void)
 			if (check == 0) {
 				state = 2;
 				time = TIME_MAX;
-//				HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
 				char c1[8] = "-1";
 				HAL_UART_Transmit(&huart6, &c1, strlen(c1), 100);
-
 			}
 		} else if (state == 2) {
 			htim3.Instance->CCR1 = CCR_MAX;
@@ -207,13 +186,10 @@ int main(void)
 			HAL_Delay(1500);
 			HCSR04_Read2();
 			HAL_Delay(500);
-//			sprintf(buffer,"%d\n\r", Distance2);
-//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
 			state = 0;
-			char c2[8] = "";
+			char c2[8];
 			sprintf(c2,"%d", Distance2);
 			HAL_UART_Transmit(&huart6, &c2, strlen(c2), 100);
-//			HAL_UART_Transmit(&huart2, &c2, strlen(c2), 100);
 		} else if (state == 4) {
 			htim3.Instance->CCR1 = CCR_MAX;
 		}
@@ -600,10 +576,8 @@ void HCSR04_Read2(void) {
 HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN2, GPIO_PIN_SET); // pull the TRIG pin HIGH
 delay(10);  // wait for 10 us
 HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN2, GPIO_PIN_RESET); // pull the TRIG pin low
+
 __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC4);
-//char c[8] = "";
-//sprintf(c,"%d", Distance2);
-//HAL_UART_Transmit(&huart2, &c, strlen(c), 100);
 
 }
 
