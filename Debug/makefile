@@ -30,34 +30,34 @@ endif
 
 -include ../makefile.defs
 
-BUILD_ARTIFACT_NAME := Draft1
+BUILD_ARTIFACT_NAME := Final-Smart-Trash-Can
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX := 
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Draft1.elf \
+Final-Smart-Trash-Can.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Draft1.list \
+Final-Smart-Trash-Can.list \
 
 OBJCOPY_BIN += \
-Draft1.bin \
+Final-Smart-Trash-Can.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Draft1.elf secondary-outputs
+main-build: Final-Smart-Trash-Can.elf secondary-outputs
 
 # Tool invocations
-Draft1.elf: $(OBJS) $(USER_OBJS) D:\Chula\Year\ 2\Semester\ II\EMBEDDED\ SYS\ LAB\FINAL\ LAB\STM32F411RETX_FLASH.ld
-	arm-none-eabi-gcc -o "Draft1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Chula\Year 2\Semester II\EMBEDDED SYS LAB\FINAL LAB\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Draft1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Final-Smart-Trash-Can.elf: $(OBJS) $(USER_OBJS) D:\Study\EmbeddedSysLab\Smart-Trash-Can\STM32F411RETX_FLASH.ld
+	arm-none-eabi-gcc -o "Final-Smart-Trash-Can.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Study\EmbeddedSysLab\Smart-Trash-Can\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Final-Smart-Trash-Can.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -66,13 +66,13 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Draft1.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Draft1.list"
+Final-Smart-Trash-Can.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Final-Smart-Trash-Can.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Draft1.bin: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Draft1.bin"
+Final-Smart-Trash-Can.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Final-Smart-Trash-Can.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
