@@ -52,6 +52,7 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
 uint32_t IC_Val1 = 0;
@@ -62,18 +63,21 @@ uint32_t IC_Val22 = 0;
 uint32_t Difference = 0;
 uint32_t Difference2 = 0;
 
-
 uint8_t Is_First_Captured = 0;  // is the first value captured ?
 uint8_t Is_Second_Captured = 0;
 
 uint8_t Distance = 0;
 uint8_t Distance2 = 0;
-
 uint8_t state = 0;
 uint8_t time = 0;
 uint8_t check = 0;
-
 uint8_t buffer[16];
+char c[8];
+
+uint8_t CHECK_MAX = 3;
+uint8_t TIME_MAX = 100;
+uint8_t CCR_MAX = 100;
+uint8_t CCR_MIN = 25;
 
 /* USER CODE END PV */
 
@@ -84,6 +88,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_USART6_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -125,6 +130,7 @@ int main(void)
   MX_TIM1_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_4);
@@ -140,84 +146,78 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//		HCSR04_Read();
+//		if(Distance < 20){
+//			sprintf(buffer,"[1] %d %d\n\r", state, Distance);
+//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+//		}
+////
+//		HAL_Delay(75);
+//
+//		HCSR04_Read2();
+//		if(Distance2 < 20){
+//			sprintf(buffer,"[2] %d %d\n\r", state, Distance2);
+//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+//		}
+		if (HAL_UART_Receive(&huart6, &c, 8, 10) == HAL_OK) {
+			HAL_UART_Transmit(&huart2, &c, strlen(c), 100);
+			if (state!= 4 && !strcmp(c, "11111111")) {
+				state = 4;
+			} else {
+				state = 3;
+			}
+		}
 		HCSR04_Read();
-		if(Distance < 20){
-			sprintf(buffer,"[1] %d %d\n\r", state, Distance);
-			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+//		sprintf(buffer,"%d %d %d %d\n\r", state, Distance, Distance2, htim3.Instance->CCR1);
+//		HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+		if (state == 0) {
+			htim3.Instance->CCR1 = CCR_MIN;
+			if (Distance < 30 && Distance > 2) {
+				state = 1;
+				check = CHECK_MAX;
+//				char c[8] = "-1";
+//				HAL_UART_Transmit(&huart6, &c, strlen(c), 100);
+			}
+		} else if (state == 1) {
+			if (Distance < 30 && Distance > 2) {
+				check--;
+			} else {
+				state = 0;
+			}
+			if (check == 0) {
+				state = 2;
+				time = TIME_MAX;
+//				HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+				char c1[8] = "-1";
+				HAL_UART_Transmit(&huart6, &c1, strlen(c1), 100);
+
+			}
+		} else if (state == 2) {
+			htim3.Instance->CCR1 = CCR_MAX;
+			if (Distance < 30 && Distance > 2) {
+				time = TIME_MAX;
+			} else {
+				time--;
+				if (time == 0) {
+					state = 3;
+				}
+			}
+		} else if (state == 3) {
+			htim3.Instance->CCR1 = CCR_MIN;
+			HAL_Delay(1500);
+			HCSR04_Read2();
+			HAL_Delay(500);
+//			sprintf(buffer,"%d\n\r", Distance2);
+//			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
+			state = 0;
+			char c2[8] = "";
+			sprintf(c2,"%d", Distance2);
+			HAL_UART_Transmit(&huart6, &c2, strlen(c2), 100);
+//			HAL_UART_Transmit(&huart2, &c2, strlen(c2), 100);
+		} else if (state == 4) {
+			htim3.Instance->CCR1 = CCR_MAX;
 		}
-//
-		HAL_Delay(75);
-
-		HCSR04_Read2();
-		if(Distance2 < 20){
-			sprintf(buffer,"[2] %d %d\n\r", state, Distance2);
-			HAL_UART_Transmit(&huart2, &buffer, strlen(buffer), 100);
-		}
-//		if (state == 0) {
-//			if (Distance < 30 && Distance > 2) {
-//				state = 1;
-//				check = 10;
-//			} else {
-//				htim3.Instance->CCR1 = 30;
-//			}
-//		} else if (state == 1) {
-//			if (Distance < 30 && Distance > 2) {
-//				check--;
-//			} else {
-//				state = 0;
-//			}
-//			if (check == 0) {
-//				state = 2;
-//				time = 100;
-//			}
-//		} else if (state = 2) {
-//			htim3.Instance->CCR1 = 135;
-//			if (Distance < 30 && Distance > 2) {
-//				time = 100;
-//			} else {
-//				time--;
-//				if (time == 0) {
-//					state = 0;
-//				}
-//			}
-//		}
-		HAL_Delay(75);
-		//		__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, 100);
-//		HAL_Delay(2000);
-//		__HAL_TIM_SetCompare(&htim3, TIM_CHANNEL_1, 75);
-//		SERVO_MoveTo(SERVO_Motor1, 0);
-//		HAL_Delay(2000);
-//		SERVO_MoveTo(SERVO_Motor1, 180);
-//		HAL_Delay(2000);
-//		htim3.Instance->CCR1 = 30;
-//		HAL_Delay(1000);
-//		htim3.Instance->CCR1 = 135;
-//		HAL_Delay(1000);
-//		while (htim3.Instance->CCR1 < 66) {
-//			htim3.Instance->CCR1 = htim3.Instance->CCR1 + 1;
-//			sprintf(b, "%d\n\r", htim3.Instance->CCR1);
-//			HAL_UART_Transmit(&huart2, &b, strlen(b), 100);
-//			HAL_Delay(100);
-//
-//		}
-//		while (htim3.Instance->CCR1 > 33) {
-//			htim3.Instance->CCR1 = htim3.Instance->CCR1 - 1;
-//			sprintf(b, "%d\n\r", htim3.Instance->CCR1);
-//			HAL_UART_Transmit(&huart2, &b, strlen(b), 100);
-//			HAL_Delay(100);
-//		}
-
-//		htim3.Instance->CCR1 = 66;
-//		sprintf(b, "%d\n\r", htim3.Instance->CCR1);
-//		HAL_UART_Transmit(&huart2, &b, strlen(b), 100);
-//		for (int i = 0; i < 1000000; i++)
-//			;
-//		htim3.Instance->CCR1 = 33;
-//		sprintf(b, "%d\n\r", htim3.Instance->CCR1);
-//		HAL_UART_Transmit(&huart2, &b, strlen(b), 100);
-//		for (int i = 0; i < 1000000; i++)
-//			;
-
+		HAL_Delay(15);
 }
   /* USER CODE END 3 */
 }
@@ -398,7 +398,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 33;
+  sConfigOC.Pulse = 25;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -442,6 +442,39 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
 
 }
 
@@ -567,8 +600,10 @@ void HCSR04_Read2(void) {
 HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN2, GPIO_PIN_SET); // pull the TRIG pin HIGH
 delay(10);  // wait for 10 us
 HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN2, GPIO_PIN_RESET); // pull the TRIG pin low
-
 __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC4);
+//char c[8] = "";
+//sprintf(c,"%d", Distance2);
+//HAL_UART_Transmit(&huart2, &c, strlen(c), 100);
 
 }
 

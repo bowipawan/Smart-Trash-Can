@@ -56,8 +56,8 @@ all: main-build
 main-build: Draft1.elf secondary-outputs
 
 # Tool invocations
-Draft1.elf: $(OBJS) $(USER_OBJS) D:\Chula\Year\ 2\Semester\ II\EMBEDDED\ SYS\ LAB\FINAL\ LAB\STM32F411RETX_FLASH.ld
-	arm-none-eabi-gcc -o "Draft1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Chula\Year 2\Semester II\EMBEDDED SYS LAB\FINAL LAB\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Draft1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Draft1.elf: $(OBJS) $(USER_OBJS) D:\Study\EmbeddedSysLab\Smart-Trash-Can\STM32F411RETX_FLASH.ld
+	arm-none-eabi-gcc -o "Draft1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\Study\EmbeddedSysLab\Smart-Trash-Can\STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Draft1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
