@@ -21,7 +21,7 @@ const microgear = Microgear.create({
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { time: null, msg: null };
+    this.state = { time: null, msg: "OFF",value:0 };
     // this.onSwitch = this.onSwitch.bind(this);
     this.onMessage = this.onMessage.bind(this);
     // microgear.on("message", this.onMessage);
@@ -40,14 +40,20 @@ class App extends Component {
   }
 
   onconnected() {
-    microgear.setAlias("nodeMCU2");
+    microgear.setAlias("nodeMCU");
     // console.log("connected");
   }
 
   onMessage(topic, msg2) {
     console.log(msg2);
     const nowTime = new Date().getUTCHours() + ":" + new Date().getUTCMinutes();
-    this.setState({ time: nowTime, msg: msg2 });
+    
+    if(msg2==-1){
+      this.setState({ time: nowTime, msg: "OFF" });
+    }
+    else{
+      this.setState({ time: nowTime, msg: "ON" ,value:msg2});
+    }
   }
 
   onSwitch = (event) => {
@@ -61,10 +67,15 @@ class App extends Component {
   };
 
   render() {
+
+    let pict=null;
+    if(this.state.msg){
+      pict=(<img src={this.state.msg==='ON'?openImg:closeImg}   ></img>)
+    }
     return (
       <div className="App">
         <Container>
-          <p>time {"[" + this.state.time + "] : " + this.state.msg}</p>
+          <p>time {"[" + this.state.time + "] : " + this.state.msg +" : "+this.state.value}</p>
           {/* <Grid
             container
             style={{
@@ -73,7 +84,7 @@ class App extends Component {
               margin: "0 auto",
             }}
           > */}
-          <Avatar src={closeImg} sizes="500" style={{ width: "50" }}></Avatar>
+          {pict}
           <form onSubmit={this.onSwitch}>
             <TextField
               id="text"

@@ -7,7 +7,7 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid     = "poom_wifi";  //ชื่อ wifi
+const char* ssid     = "poom";  //ชื่อ wifi
 const char* password = "0896827979";  //รหัสผ่าน wifi
 
 #define APPID   "SmartTrashCan"                    //ใส่ appid จากเว็บ
@@ -22,6 +22,7 @@ unsigned long previousMillis = 0;
 const long interval = 1000;
 int x1, x2;
 
+int timee=0;
 char msg[100];
 String data;
 int state = 0;
@@ -97,11 +98,13 @@ void loop() {
   if (microgear.connected()) {
     digitalWrite(2, LOW); //ไฟบนบอร์ดติดถ้าเชื่อมต่อ NETPIE
     microgear.loop();
-
+//  Serial.println(state);
+  
   if (state == 0   ) {
     if (Serial.available() > 0) {
       state = 1;
       incomingChar = Serial.read();
+//      Serial.println(incomingChar);
       data += incomingChar;
     }
 
@@ -109,6 +112,7 @@ void loop() {
 
     if (Serial.available() > 0) {
       incomingChar = Serial.read();
+//      Serial.println(incomingChar);
       data += incomingChar;
     } else {
       state = 2;
@@ -117,17 +121,32 @@ void loop() {
   } else if (state == 2) {
 
       Serial.println(data);
-      microgear.publish("/x", data); 
-      data = "";
+      
+      
       state = 0;
+      
+      if(data=="-1"){
+        microgear.publish("/toggle", "ON");   
+      }else{
+        microgear.publish("/toggle", "OFF");   
+        microgear.publish("/value", data);    
+      }
+      data = "";
       data.toCharArray(msg, (data.length() + 1));
 
   }
 
-  if(web!=""){
-      Serial.write(web);
-    Serial.println(""); 
+  if(web!=""&& timee==2 ){
+    timee=0;
     web="";
+      Serial.write(web);
+//    Serial.println(""); 
+    timee=0;
+    }else if(web!="" ){
+
+      Serial.write(web);
+//      Serial.println(""); 
+      timee++;
     }
 //    unsigned long currentMillis = millis();
 //    if (currentMillis - previousMillis >= interval) { //ทำงานทุกๆ 1 วินาที(interval)
