@@ -27,13 +27,16 @@ String data;
 int state = 0;
 char incomingChar;
 
+char* web;
+
 /* If a new message arrives, do this */
 void onMsghandler(char *topic, uint8_t* msg, unsigned int msglen) {
 //  Serial.print("Incoming message --> ");
   msg[msglen] = '\0';
-  Serial.println((char *)msg);
-  char a[10]="123";
-  Serial.write(a);
+//  Serial.println((char *)msg);
+//  char a[10]="123";
+  web= (char*) msg;
+//  Serial.println("123");
 }
 
 void onFoundgear(char *attribute, uint8_t* msg, unsigned int msglen) {
@@ -119,11 +122,13 @@ void loop() {
       state = 0;
       data.toCharArray(msg, (data.length() + 1));
 
-//      Serial.write("456");
-       
-
-    
   }
+
+  if(web!=""){
+      Serial.write(web);
+    Serial.println(""); 
+    web="";
+    }
 //    unsigned long currentMillis = millis();
 //    if (currentMillis - previousMillis >= interval) { //ทำงานทุกๆ 1 วินาที(interval)
 //      previousMillis = currentMillis;

@@ -51,10 +51,10 @@ class App extends Component {
   }
 
   onSwitch = (event) => {
-    // const topic = config.topic;
+    const topic = config.topic;
     // this.setState({ waiting: true });
     event.preventDefault();
-    // microgear.publish(topic, 'ON' );
+    // microgear.publish(topic, event.target.text.value );
     // console.log(event.target.text.value)
     // console.log(event.target.text.value)
     microgear.chat("nodeMCU", event.target.text.value);
