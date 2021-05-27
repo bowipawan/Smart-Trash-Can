@@ -147,6 +147,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		if (HAL_UART_Receive(&huart6, &c, 8, 10) == HAL_OK) {
 			if (state!=4 && !strcmp(c, "11111111")) {
+				char c1[8] = "-1";
+				HAL_UART_Transmit(&huart6, &c1, strlen(c1), 100);
 				state = 4;
 			} else if (state!=3 && !strcmp(c, "00000000")) {
 				state = 3;
